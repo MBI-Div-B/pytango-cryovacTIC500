@@ -81,7 +81,7 @@ class CryovacTIC500(CryovacTIC500Base, Device):
 
     output1_on: bool = attribute()
     output1_value: float = attribute(
-        fget=partial(get_channel_value, channel=OUT1),
+        fget=partial(CryovacTIC500Base.get_channel_value, channel=OUT1),
         fset=partial(CryovacTIC500Base.set_channel_value, channel=OUT1),
         doc="Heater output power",
         unit="W",
