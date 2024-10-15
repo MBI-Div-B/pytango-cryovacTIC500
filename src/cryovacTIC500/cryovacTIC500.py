@@ -50,6 +50,12 @@ class CryovacTIC500Base:
     def get_PID_ramp_setpoint(self, channel: str) -> float:
         ans = self.query(f"{channel}.PID.RampT")
         return float(ans)
+    
+    def get_PID_ramp_rate(self, channel: str) -> float:
+        ans = self.query(f"{channel}.PID.Ramp")
+    
+    def set_PID_ramp_rate(self, channel: str, value: float) -> None:
+        self.send_command(f"{channel}.PID.Ramp={value}")
 
     def get_PID_on(self, channel: str) -> bool:
         ans = self.query(f"{channel}.PID.mode")
@@ -79,7 +85,7 @@ class CryovacTIC500(CryovacTIC500Base, Device):
     host: str = device_property(doc="Hostname or IP address")
     port: int = device_property(default_value=23)
 
-    output1_on: bool = attribute()
+    # output1_on: bool = attribute()
     output1_value: float = attribute(
         fget=partial(CryovacTIC500Base.get_channel_value, channel=OUT1),
         fset=partial(CryovacTIC500Base.set_channel_value, channel=OUT1),
@@ -95,12 +101,13 @@ class CryovacTIC500(CryovacTIC500Base, Device):
     output1_ramp_setpoint: float = attribute(
         doc="Momentary setpoint, determined by internal ramp",
         unit="K",
-        fget=partial(CryovacTIC500Base.get_ramp_setpoint, channel=OUT1),
+        fget=partial(CryovacTIC500Base.get_PID_ramp_setpoint, channel=OUT1),
     )
     output1_ramp_rate: float = attribute(
         doc="Zero disables ramping",
         unit="K/s",
-        fget=partial(CryovacTIC500Base.get_ramp_rate, channel=OUT1),
+        fget=partial(CryovacTIC500Base.get_PID_ramp_rate, channel=OUT1),
+        fset=partial(CryovacTIC500Base.set_PID_ramp_rate, channel=OUT1),
         )
     output1_PID_on: bool = attribute(
         doc="PID control enabled (True) or disabled (False)",
