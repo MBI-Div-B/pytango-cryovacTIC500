@@ -7,7 +7,7 @@ class CryovacTIC500(Device):
     host: str = device_property(doc="Hostname or IP address")
     port: int = device_property(default_value=23)
 
-    def init_device(self):
+    def init_device(self) -> None:
         super().init_device()
         try:
             self.conn = socket.socket()
@@ -20,5 +20,9 @@ class CryovacTIC500(Device):
 
     @command
     def query(self, cmd: str) -> str:
-        ans = self.conn.query(cmd)
-        return ans
+        self.conn.send(f"{cmd}\n".encode())
+        ans = self.conn.recv(1024)
+        return ans.decode().strip()
+    
+    def delete_device(self) -> None:
+        self.conn.close()
