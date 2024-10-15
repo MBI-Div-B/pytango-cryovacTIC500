@@ -24,57 +24,57 @@ class CryovacTIC500(Device):
 
     output1_on: bool = attribute()
     output1_value: float = attribute(
-        fget=partial(self.get_channel_value, channel=OUT1),
-        fset=partial(self.set_channel_value, channel=OUT1),
+        fget=partial(get_channel_value, channel=OUT1),
+        fset=partial(set_channel_value, channel=OUT1),
         doc="Heater output power",
         unit="W",
     )
     output1_setpoint: float = attribute(
         doc="Temperature setpoint",
         unit="K",
-        fget=partial(self.get_PID_setpoint, channel=OUT1),
-        fset=partial(self.set_PID_setpoint, channel=OUT1),
+        fget=partial(get_PID_setpoint, channel=OUT1),
+        fset=partial(set_PID_setpoint, channel=OUT1),
     )
     output1_ramp_setpoint: float = attribute(
         doc="Momentary setpoint, determined by internal ramp",
         unit="K",
-        fget=partial(self.get_ramp_setpoint, channel=OUT1),
+        fget=partial(get_ramp_setpoint, channel=OUT1),
     )
     output1_ramp_rate: float = attribute(
         doc="Zero disables ramping",
         unit="K/s",
-        fget=partial(self.get_ramp_rate, channel=OUT1),
+        fget=partial(get_ramp_rate, channel=OUT1),
         )
     output1_PID_on: bool = attribute(
         doc="PID control enabled (True) or disabled (False)",
-        fget=partial(self.get_PID_on, channel=OUT1),
-        fset=partial(self.set_PID_on, channel=OUT1)
+        fget=partial(get_PID_on, channel=OUT1),
+        fset=partial(set_PID_on, channel=OUT1)
     )
     output1_P: float = attribute(
-        fget=partial(self.get_PID_parameter, channel=OUT1, parameter="P"),
-        fset=partial(self.set_PID_parameter, channel=OUT1, parameter="P"),
+        fget=partial(get_PID_parameter, channel=OUT1, parameter="P"),
+        fset=partial(set_PID_parameter, channel=OUT1, parameter="P"),
     )
     output1_I: float = attribute(
-        fget=partial(self.get_PID_parameter, channel=OUT1, parameter="I"),
-        fset=partial(self.set_PID_parameter, channel=OUT1, parameter="I"),
+        fget=partial(get_PID_parameter, channel=OUT1, parameter="I"),
+        fset=partial(set_PID_parameter, channel=OUT1, parameter="I"),
     )
     output1_D: float = attribute(
-        fget=partial(self.get_PID_parameter, channel=OUT1, parameter="D"),
-        fset=partial(self.set_PID_parameter, channel=OUT1, parameter="D"),
+        fget=partial(get_PID_parameter, channel=OUT1, parameter="D"),
+        fset=partial(set_PID_parameter, channel=OUT1, parameter="D"),
     )
     output1_control_channel: str = attribute(
         doc="Input channel number to be used as PID control input",
-        fget=partial(self.get_PID_input, channel=OUT1),
-        fset=partial(self.set_PID_input, channel=OUT1),
+        fget=partial(get_PID_input, channel=OUT1),
+        fset=partial(set_PID_input, channel=OUT1),
     )
 
     input1_type: SensorType = attribute(
         doc="Sensor type",
-        fget=partial(self.get_sensor_type, channel=IN1),
-        fset=partial(self.set_sensor_type, channel=IN1),
+        fget=partial(get_sensor_type, channel=IN1),
+        fset=partial(set_sensor_type, channel=IN1),
     )
     input1_value: float = attribute(
-        fget=partial(self.get_channel_value, channel=IN1),
+        fget=partial(get_channel_value, channel=IN1),
         doc="Sensor input reading",
         unit="K",
     )
