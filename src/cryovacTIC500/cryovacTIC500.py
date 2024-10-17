@@ -147,7 +147,7 @@ class CryovacTIC500(Device):
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
-        ans = self.query(f"{channel}.{variable}={value}")
+        ans = self.query(f"{channel}.{cmd}={value}")
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         if cmd != cmd_ret.lower():
             raise RuntimeError(
