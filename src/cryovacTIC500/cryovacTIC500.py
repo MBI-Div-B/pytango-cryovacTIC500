@@ -69,6 +69,7 @@ class CryovacTIC500(Device):
             self.conn.connect((self.host, self.port))
             self.conn.settimeout(0.5)
             self.set_state(DevState.ON)
+            self.send_command("system.com.verbose=high")  # always reply to commands
         except Exception as exc:
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
@@ -134,4 +135,4 @@ class CryovacTIC500(Device):
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
         self.debug_stream(f"generic_write({channel}, {variable}, {value})")
-        self.send_command(f"{channel}.{variable}={value}")
+        self.query(f"{channel}.{variable}={value}")
