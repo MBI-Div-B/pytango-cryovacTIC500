@@ -5,11 +5,6 @@ from enum import IntEnum
 from functools import partial
 
 
-OUT1 = "Out1"
-OUT2 = "Out2"
-IN1 = "In1"
-IN2 = "In2"
-
 class SensorType(IntEnum):
     RTD = 0
     Thermistor = 1
@@ -33,12 +28,20 @@ class PIDMode(IntEnum):
     On = 1
     # Follow = 2
 
+PIDInputs = IntEnum("PIDInputs", [
+    ("In 1", 0),
+    ("In 2", 1),
+    ("In 3", 2),
+    ("In 4", 3),
+])
+
+
 OUTPUT_CHANNEL_ATTRIBUTES = dict(
     power=dict(cmd="Value", dtype=float),
     setpoint=dict(cmd="pid.Setpoint", dtype=float),
     ramp=dict(cmd="pid.Ramp", dtype=float),
     ramp_setpoint=dict(cmd="pid.Ramp T", dtype=float),
-    PID_input=dict(cmd="pid.Input", dtype=str),
+    PID_input=dict(cmd="pid.Input", dtype=PIDInputs),
     PID_mode=dict(cmd="pid.Mode", dtype=PIDMode),
     P=dict(cmd="pid.P", dtype=float),
     I=dict(cmd="pid.I", dtype=float),
@@ -149,7 +152,7 @@ class CryovacTIC500(Device):
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
-        ans = self.query(f"({channel}.{cmd})={value}")
+        ans = self.query(f"({channel}.{cmd})=({value})")
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         if cmd != cmd_ret:
             self.warn_stream(
