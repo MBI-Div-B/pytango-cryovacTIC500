@@ -120,7 +120,7 @@ class CryovacTIC500(Device):
         cmd = self._channel_attrs[variable]["cmd"]
         dtype = self._channel_attrs[variable]["dtype"]
         ans = self.query(f"{channel}.{cmd}?")
-        self.log_debug(f"generic_read({channel}, {variable}) -> {ans}")
+        self.debug(f"generic_read({channel}, {variable}) -> {ans}")
         if issubclass(dtype, IntEnum):
             return dtype[ans]
         else:
@@ -133,5 +133,5 @@ class CryovacTIC500(Device):
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
-        self.log_debug(f"generic_write({channel}, {variable}, {value})")
+        self.debug(f"generic_write({channel}, {variable}, {value})")
         self.send_command(f"{channel}.{variable}={value}")
