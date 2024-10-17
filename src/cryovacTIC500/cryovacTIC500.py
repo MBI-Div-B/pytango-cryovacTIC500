@@ -58,6 +58,8 @@ class CryovacTIC500(Device):
     host: str = device_property(doc="Hostname or IP address")
     port: int = device_property(default_value=23)
 
+    output_on: bool = attribute()
+
     def init_device(self) -> None:
         super().init_device()
         self._channel_attrs = {}
@@ -72,6 +74,14 @@ class CryovacTIC500(Device):
         except Exception as exc:
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
+    
+    def get_output_on(self) -> bool:
+        ans = self.query("outputEnable?")
+        return "OutputEnable = On" in ans
+
+    def set_output_on(self, value: bool) -> None:
+        val = "on" if value else "off"
+        ans = self.query(f"outputEnable = {val}")
 
     @command
     def query(self, cmd: str) -> str:
@@ -108,11 +118,13 @@ class CryovacTIC500(Device):
                 self.add_attribute(attr)
         for n in [1, 2, 3, 4]:  # four input channels
             for name, conf in INPUT_CHANNEL_ATTRIBUTES.items():
+                access = conf.get("access", RW)
+                fset = self.generic_write if access == RW else None
                 attr = attribute(
                     name=f"In{n}.{name}",
                     dtype=conf["dtype"],
                     fget=self.generic_read,
-                    fset=self.generic_write,
+                    fset=fset,
                 )
                 self.add_attribute(attr)
     
