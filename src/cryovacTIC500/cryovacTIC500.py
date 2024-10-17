@@ -34,24 +34,24 @@ class PIDMode(IntEnum):
     # Follow = 2
 
 OUTPUT_CHANNEL_ATTRIBUTES = dict(
-    power=dict(cmd="value", dtype=float),
-    setpoint=dict(cmd="PID.setpoint", dtype=float),
-    ramp=dict(cmd="PID.Ramp", dtype=float),
-    ramp_setpoint=dict(cmd="PID.RampT", dtype=float),
-    PID_input=dict(cmd="PID.input", dtype=str),
-    PID_mode=dict(cmd="PID.Mode", dtype=PIDMode),
-    P=dict(cmd="PID.P", dtype=float),
-    I=dict(cmd="PID.I", dtype=float),
-    D=dict(cmd="PID.D", dtype=float),
-    tune_mode=dict(cmd="Tune.Mode", dtype=TuneMode),
-    tune_type=dict(cmd="Tune.Type", dtype=TuneType),
-    tune_lag=dict(cmd="Tune.Lag", dtype=float),
-    tune_stepY=dict(cmd="Tune.StepY", dtype=float),
+    power=dict(cmd="Value", dtype=float),
+    setpoint=dict(cmd="pid.Setpoint", dtype=float),
+    ramp=dict(cmd="pid.Ramp", dtype=float),
+    ramp_setpoint=dict(cmd="pid.Ramp T", dtype=float),
+    PID_input=dict(cmd="pid.input", dtype=str),
+    PID_mode=dict(cmd="pid.Mode", dtype=PIDMode),
+    P=dict(cmd="pid.P", dtype=float),
+    I=dict(cmd="pid.I", dtype=float),
+    D=dict(cmd="pid.D", dtype=float),
+    tune_mode=dict(cmd="tune.Mode", dtype=TuneMode),
+    tune_type=dict(cmd="tune.Type", dtype=TuneType),
+    tune_lag=dict(cmd="tune.Lag", dtype=float),
+    tune_stepY=dict(cmd="tune.Step Y", dtype=float),
 )
 
 INPUT_CHANNEL_ATTRIBUTES = dict(
-    temperature=dict(cmd="value", dtype=float),
-    sensor_type=dict(cmd="sensor", dtype=SensorType),
+    temperature=dict(cmd="Value", dtype=float),
+    sensor_type=dict(cmd="Sensor", dtype=SensorType),
 )
 
 class CryovacTIC500(Device):
@@ -125,13 +125,13 @@ class CryovacTIC500(Device):
     
     def generic_read(self, attr: attribute):
         channel, variable = attr.get_name().split(".")
-        cmd = self._channel_attrs[variable]["cmd"].lower()
+        cmd = self._channel_attrs[variable]["cmd"]
         dtype = self._channel_attrs[variable]["dtype"]
         ans = self.query(f"{channel}.{cmd}?")
         
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         self.debug_stream(f"generic_read -> {ans}")
-        if cmd != cmd_ret.lower():
+        if cmd != cmd_ret:
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
             )
@@ -144,13 +144,13 @@ class CryovacTIC500(Device):
     def generic_write(self, attr: attribute) -> None:
         channel, variable = attr.get_name().split(".")
         value = attr.get_write_value()
-        cmd = self._channel_attrs[variable]["cmd"].lower()
+        cmd = self._channel_attrs[variable]["cmd"]
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
-        ans = self.query(f"{channel}.{cmd}={value}")
+        ans = self.query(f"({channel}.{cmd})={value}")
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
-        if cmd != cmd_ret.lower():
+        if cmd != cmd_ret:
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
             )
