@@ -115,7 +115,7 @@ class CryovacTIC500(Device):
         self.conn.close()
     
     def initialize_dynamic_attributes(self):
-        for n in [1, 2]:  # two output channels
+        for n in self.output_channels:
             for name, conf in OUTPUT_CHANNEL_ATTRIBUTES.items():
                 access = conf.get("access", RW)
                 fset = self.generic_write if access == RW else None
@@ -126,7 +126,7 @@ class CryovacTIC500(Device):
                     fset=fset,
                 )
                 self.add_attribute(attr)
-        for n in [1, 2, 3, 4]:  # four input channels
+        for n in self.input_channels:
             for name, conf in INPUT_CHANNEL_ATTRIBUTES.items():
                 access = conf.get("access", RW)
                 fset = self.generic_write if access == RW else None
