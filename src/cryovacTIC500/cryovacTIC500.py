@@ -11,11 +11,13 @@ class SensorType(IntEnum):
     Diode = 2
     ROX = 3
 
+
 class TuneMode(IntEnum):
     Off = 0
     Auto = 1
     Step = 2
     Relay = 3
+
 
 class TuneType(IntEnum):
     Conservative = 0
@@ -23,10 +25,12 @@ class TuneType(IntEnum):
     Aggressive = 2
     Auto = 3
 
+
 class PIDMode(IntEnum):
     Off = 0
     On = 1
     # Follow = 2
+
 
 RO = AttrWriteType.READ
 RW = AttrWriteType.READ_WRITE
@@ -53,6 +57,7 @@ INPUT_CHANNEL_ATTRIBUTES = dict(
     sensor_type=dict(cmd="Sensor", dtype=SensorType),
 )
 
+
 class CryovacTIC500(Device):
 
     host: str = device_property(doc="Hostname or IP address")
@@ -62,8 +67,7 @@ class CryovacTIC500(Device):
         default_value=[1, 2, 3, 4],
     )
     output_channels: [int] = device_property(
-        doc="List of output channels to use (1-2)",
-        default_value=[1, 2]
+        doc="List of output channels to use (1-2)", default_value=[1, 2]
     )
 
     output_on: bool = attribute(doc="Enable all outputs")
@@ -82,7 +86,7 @@ class CryovacTIC500(Device):
         except Exception as exc:
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
-    
+
     @output_on.read
     def read_output_on(self) -> bool:
         ans = self.query("outputEnable?")
@@ -102,18 +106,18 @@ class CryovacTIC500(Device):
             self.error_stream(ans)
             raise RuntimeError(ans)
         return ans
-    
+
     @command
     def send_command(self, cmd: str) -> None:
         self.conn.send(f"{cmd}\n".encode())
-    
+
     @command
     def get_description(self) -> str:
         return self.query("description")
-    
+
     def delete_device(self) -> None:
         self.conn.close()
-    
+
     def initialize_dynamic_attributes(self):
         for n in self.output_channels:
             for name, conf in OUTPUT_CHANNEL_ATTRIBUTES.items():
@@ -137,7 +141,7 @@ class CryovacTIC500(Device):
                     fset=fset,
                 )
                 self.add_attribute(attr)
-    
+
     def ensure_verbose_communication(self):
         ans = self.query("system.com.verbose?")
         if not "High" in ans:
@@ -145,25 +149,25 @@ class CryovacTIC500(Device):
             self.send_command(f"system.com.verbose=high")
         else:
             self.info_stream("Device communication is verbose.")
-    
+
     def generic_read(self, attr: attribute):
         channel, variable = attr.get_name().split(".")
         cmd = self._channel_attrs[variable]["cmd"]
         dtype = self._channel_attrs[variable]["dtype"]
         ans = self.query(f"({channel}.{cmd}?)")
-        
+
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         self.debug_stream(f"generic_read -> {ans}")
         if not cmd_ret.endswith(cmd):
             self.warn_stream(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
             )
-        
+
         if issubclass(dtype, IntEnum):
             return dtype[ans]
         else:
             return dtype(ans)
-    
+
     def generic_write(self, attr: attribute) -> None:
         channel, variable = attr.get_name().split(".")
         value = attr.get_write_value()
