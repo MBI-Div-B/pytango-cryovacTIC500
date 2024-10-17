@@ -112,11 +112,10 @@ class CryovacTIC500(Device):
                 self.add_attribute(attr)
     
     def ensure_verbose_communication(self):
-        cmd = "system.com.verbose?"
-        ans = self.query(cmd)
+        ans = self.query("system.com.verbose?")
         if not "High" in ans:
             self.info_stream("Setting device communication to verbose.")
-            self.send_command("system.com.verbose=high")
+            self.send_command(f"system.com.verbose=high")
         else:
             self.info_stream("Device communication is verbose.")
     
