@@ -130,6 +130,7 @@ class CryovacTIC500(Device):
         ans = self.query(f"{channel}.{cmd}?")
         
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
+        self.debug_stream(f"generic_read -> {ans}")
         if cmd != cmd_ret.lower():
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
