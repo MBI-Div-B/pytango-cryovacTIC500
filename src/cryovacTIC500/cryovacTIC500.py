@@ -58,7 +58,7 @@ class CryovacTIC500(Device):
     host: str = device_property(doc="Hostname or IP address")
     port: int = device_property(default_value=23)
 
-    output_on: bool = attribute()
+    output_on: bool = attribute(doc="Enable all outputs")
 
     def init_device(self) -> None:
         super().init_device()
@@ -75,10 +75,12 @@ class CryovacTIC500(Device):
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
     
+    @output_on.read
     def read_output_on(self) -> bool:
         ans = self.query("outputEnable?")
         return "OutputEnable = On" in ans
 
+    @output_on.write
     def write_output_on(self, value: bool) -> None:
         val = "on" if value else "off"
         ans = self.query(f"outputEnable = {val}")
