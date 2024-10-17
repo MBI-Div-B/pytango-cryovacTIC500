@@ -38,7 +38,7 @@ OUTPUT_CHANNEL_ATTRIBUTES = dict(
     setpoint=dict(cmd="pid.Setpoint", dtype=float),
     ramp=dict(cmd="pid.Ramp", dtype=float),
     ramp_setpoint=dict(cmd="pid.Ramp T", dtype=float),
-    PID_input=dict(cmd="pid.input", dtype=str),
+    PID_input=dict(cmd="pid.Input", dtype=str),
     PID_mode=dict(cmd="pid.Mode", dtype=PIDMode),
     P=dict(cmd="pid.P", dtype=float),
     I=dict(cmd="pid.I", dtype=float),
