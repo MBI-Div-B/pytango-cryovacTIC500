@@ -28,12 +28,15 @@ class PIDMode(IntEnum):
     On = 1
     # Follow = 2
 
+RO = AttrWriteType.READ
+RW = AttrWriteType.READ_WRITE
 
+# by default, access is READ_WRITE
 OUTPUT_CHANNEL_ATTRIBUTES = dict(
     power=dict(cmd="Value", dtype=float),
     setpoint=dict(cmd="pid.Setpoint", dtype=float),
     ramp=dict(cmd="pid.Ramp", dtype=float),
-    ramp_setpoint=dict(cmd="pid.Ramp T", dtype=float),
+    ramp_setpoint=dict(cmd="pid.Ramp T", dtype=float, access=RO),
     PID_input=dict(cmd="pid.Input", dtype=str),
     PID_mode=dict(cmd="pid.Mode", dtype=PIDMode),
     P=dict(cmd="pid.P", dtype=float),
@@ -46,7 +49,7 @@ OUTPUT_CHANNEL_ATTRIBUTES = dict(
 )
 
 INPUT_CHANNEL_ATTRIBUTES = dict(
-    temperature=dict(cmd="Value", dtype=float),
+    temperature=dict(cmd="Value", dtype=float, access=RO),
     sensor_type=dict(cmd="Sensor", dtype=SensorType),
 )
 
@@ -77,7 +80,7 @@ class CryovacTIC500(Device):
         self.debug_stream(f"query({cmd}) -> {ans}")
         if ans.startswith("Error"):
             self.error_stream(ans)
-            return ""
+            raise RuntimeError(ans)
         return ans
     
     @command
@@ -94,11 +97,13 @@ class CryovacTIC500(Device):
     def initialize_dynamic_attributes(self):
         for n in [1, 2]:  # two output channels
             for name, conf in OUTPUT_CHANNEL_ATTRIBUTES.items():
+                access = conf.get("access", RW)
+                fset = self.generic_write if access == RW else None
                 attr = attribute(
                     name=f"Out{n}.{name}",
                     dtype=conf["dtype"],
                     fget=self.generic_read,
-                    fset=self.generic_write,
+                    fset=fset,
                 )
                 self.add_attribute(attr)
         for n in [1, 2, 3, 4]:  # four input channels
