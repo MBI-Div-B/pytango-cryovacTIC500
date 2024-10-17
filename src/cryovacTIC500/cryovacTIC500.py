@@ -117,7 +117,7 @@ class CryovacTIC500(Device):
         cmd = "system.com.verbose?"
         ans = self.query(cmd)
         self.debug_stream(f"{cmd} -> {ans}")
-        if not "high" in ans:
+        if not "high" in ans.lower():
             self.send_command("system.com.verbose=high")
     
     def generic_read(self, attr: attribute):
