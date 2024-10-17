@@ -109,7 +109,7 @@ class CryovacTIC500(Device):
             for name, conf in INPUT_CHANNEL_ATTRIBUTES.items():
                 attr = attribute(
                     name=f"In{n}.{name}",
-                    dtype=cond["dtype"],
+                    dtype=conf["dtype"],
                     fget=self.generic_read,
                     fset=self.generic_write,
                 )
