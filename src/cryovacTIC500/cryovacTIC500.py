@@ -57,6 +57,14 @@ class CryovacTIC500(Device):
 
     host: str = device_property(doc="Hostname or IP address")
     port: int = device_property(default_value=23)
+    input_channels: [int] = device_property(
+        doc="List of input channels to use (1-4)",
+        default_value=[1, 2, 3, 4],
+    )
+    output_channels: [int] = device_property(
+        doc="List of output channels to use (1-2)",
+        default_value=[1, 2]
+    )
 
     output_on: bool = attribute(doc="Enable all outputs")
 
