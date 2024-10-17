@@ -127,7 +127,7 @@ class CryovacTIC500(Device):
         channel, variable = attr.get_name().split(".")
         cmd = self._channel_attrs[variable]["cmd"]
         dtype = self._channel_attrs[variable]["dtype"]
-        ans = self.query(f"{channel}.{cmd}?")
+        ans = self.query(f"({channel}.{cmd}?)")
         
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         self.debug_stream(f"generic_read -> {ans}")
