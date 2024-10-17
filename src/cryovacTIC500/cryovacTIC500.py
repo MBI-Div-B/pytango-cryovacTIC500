@@ -80,7 +80,8 @@ class CryovacTIC500(Device):
         ans = self.conn.recv(1024).decode().strip()
         self.debug_stream(f"query({cmd}) -> {ans}")
         if ans.startswith("Error"):
-            raise RuntimeError(ans)
+            self.error_stream(ans)
+            return ""
         return ans
     
     @command
