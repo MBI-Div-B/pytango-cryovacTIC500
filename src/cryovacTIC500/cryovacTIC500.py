@@ -68,8 +68,8 @@ class CryovacTIC500(Device):
             self.conn = socket.socket()
             self.conn.connect((self.host, self.port))
             self.conn.settimeout(0.5)
+            self.ensure_verbose_communication()
             self.set_state(DevState.ON)
-            self.send_command("system.com.verbose=high")  # always reply to commands
         except Exception as exc:
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
@@ -77,12 +77,15 @@ class CryovacTIC500(Device):
     @command
     def query(self, cmd: str) -> str:
         self.conn.send(f"{cmd}\n".encode())
-        try:
-            ans = self.conn.recv(1024).decode().strip()
-        except TimeoutError:  # likely sent command with no reply
-            ans = "Timeout. Did you expect a reply?"
+        ans = self.conn.recv(1024).decode().strip()
         if ans.startswith("Error"):
             raise RuntimeError(ans)
+        elif "=" in ans:
+            cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
+            if not cmd.lower().endswith(cmd_ret):
+                raise RuntimeError(
+                    f"Received reply does not match command: {cmd} -> {cmd_ret}"
+                )
         return ans
     
     @command
@@ -115,6 +118,11 @@ class CryovacTIC500(Device):
                     fset=self.generic_write,
                 )
                 self.add_attribute(attr)
+    
+    def ensure_verbose_communication(self):
+        ans = self.query("system.com.verbose?")
+        if ans != "high":
+            self.send_command("system.com.verbose=high")
     
     def generic_read(self, attr: attribute):
         channel, variable = attr.get_name().split(".")
