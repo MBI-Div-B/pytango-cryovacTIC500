@@ -3,8 +3,7 @@ from enum import IntEnum
 from functools import partial
 
 from tango import DevState
-from tango.server import (AttrWriteType, Device, attribute, command,
-                          device_property)
+from tango.server import AttrWriteType, Device, attribute, command, device_property
 
 
 class SensorType(IntEnum):
@@ -161,9 +160,7 @@ class CryovacTIC500(Device):
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         self.debug_stream(f"generic_read -> {ans}")
         if not cmd_ret.endswith(cmd):
-            self.warn_stream(
-                f"Received reply does not match command: {cmd} -> {cmd_ret}"
-            )
+            self.warn_stream(f"Reply does not match command: {cmd} -> {cmd_ret}")
 
         if issubclass(dtype, IntEnum):
             return dtype[ans]
@@ -180,6 +177,4 @@ class CryovacTIC500(Device):
         ans = self.query(f"({channel}.{cmd})=({value})")
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
         if cmd != cmd_ret:
-            self.warn_stream(
-                f"Received reply does not match command: {cmd} -> {cmd_ret}"
-            )
+            self.warn_stream(f"reply does not match command: {cmd} -> {cmd_ret}")
