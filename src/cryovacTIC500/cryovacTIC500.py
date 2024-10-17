@@ -80,12 +80,6 @@ class CryovacTIC500(Device):
         ans = self.conn.recv(1024).decode().strip()
         if ans.startswith("Error"):
             raise RuntimeError(ans)
-        elif "=" in ans:
-            cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
-            if not cmd.lower().endswith(cmd_ret):
-                raise RuntimeError(
-                    f"Received reply does not match command: {cmd} -> {cmd_ret}"
-                )
         return ans
     
     @command
@@ -126,10 +120,17 @@ class CryovacTIC500(Device):
     
     def generic_read(self, attr: attribute):
         channel, variable = attr.get_name().split(".")
-        cmd = self._channel_attrs[variable]["cmd"]
+        cmd = self._channel_attrs[variable]["cmd"].lower()
         dtype = self._channel_attrs[variable]["dtype"]
         ans = self.query(f"{channel}.{cmd}?")
         self.debug_stream(f"generic_read({channel}, {variable}) -> {ans}")
+        
+        cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
+        if cmd != cmd_ret:
+            raise RuntimeError(
+                f"Received reply does not match command: {cmd} -> {cmd_ret}"
+            )
+        
         if issubclass(dtype, IntEnum):
             return dtype[ans]
         else:
@@ -138,9 +139,14 @@ class CryovacTIC500(Device):
     def generic_write(self, attr: attribute) -> None:
         channel, variable = attr.get_name().split(".")
         value = attr.get_write_value()
-        cmd = self._channel_attrs[variable]["cmd"]
+        cmd = self._channel_attrs[variable]["cmd"].lower()
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
         self.debug_stream(f"generic_write({channel}, {variable}, {value})")
-        self.query(f"{channel}.{variable}={value}")
+        ans = self.query(f"{channel}.{variable}={value}")
+        cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
+        if cmd != cmd_ret:
+            raise RuntimeError(
+                f"Received reply does not match command: {cmd} -> {cmd_ret}"
+            )
