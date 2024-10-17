@@ -130,7 +130,7 @@ class CryovacTIC500(Device):
         ans = self.query(f"{channel}.{cmd}?")
         
         cmd_ret, ans = [s.strip() for s in ans.split("=")]
-        if cmd != cmd_ret:
+        if cmd != cmd_ret.lower():
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
             )
