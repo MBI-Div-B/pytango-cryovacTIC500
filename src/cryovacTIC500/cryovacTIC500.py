@@ -75,11 +75,11 @@ class CryovacTIC500(Device):
             self.set_state(DevState.FAULT)
             self.set_status(str(exc))
     
-    def get_output_on(self) -> bool:
+    def read_output_on(self) -> bool:
         ans = self.query("outputEnable?")
         return "OutputEnable = On" in ans
 
-    def set_output_on(self, value: bool) -> None:
+    def write_output_on(self, value: bool) -> None:
         val = "on" if value else "off"
         ans = self.query(f"outputEnable = {val}")
 
