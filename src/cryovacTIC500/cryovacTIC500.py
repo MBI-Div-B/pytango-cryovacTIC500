@@ -1,8 +1,10 @@
 import socket
-from tango.server import Device, command, attribute, AttrWriteType, device_property
-from tango import DevState
 from enum import IntEnum
 from functools import partial
+
+from tango import DevState
+from tango.server import (AttrWriteType, Device, attribute, command,
+                          device_property)
 
 
 class SensorType(IntEnum):
