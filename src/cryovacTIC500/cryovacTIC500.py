@@ -114,8 +114,10 @@ class CryovacTIC500(Device):
                 self.add_attribute(attr)
     
     def ensure_verbose_communication(self):
-        ans = self.query("system.com.verbose?")
-        if ans != "high":
+        cmd = "system.com.verbose?"
+        ans = self.query(cmd)
+        self.debug_stream(f"{cmd} -> {ans}")
+        if not "high" in ans:
             self.send_command("system.com.verbose=high")
     
     def generic_read(self, attr: attribute):
