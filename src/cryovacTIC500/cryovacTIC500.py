@@ -78,6 +78,7 @@ class CryovacTIC500(Device):
     def query(self, cmd: str) -> str:
         self.conn.send(f"{cmd}\n".encode())
         ans = self.conn.recv(1024).decode().strip()
+        self.debug_stream(f"query({cmd}) -> {ans}")
         if ans.startswith("Error"):
             raise RuntimeError(ans)
         return ans
@@ -116,18 +117,19 @@ class CryovacTIC500(Device):
     def ensure_verbose_communication(self):
         cmd = "system.com.verbose?"
         ans = self.query(cmd)
-        self.debug_stream(f"{cmd} -> {ans}")
-        if not "high" in ans.lower():
+        if not "High" in ans:
+            self.info_stream("Setting device communication to verbose.")
             self.send_command("system.com.verbose=high")
+        else:
+            self.info_stream("Device communication is verbose.")
     
     def generic_read(self, attr: attribute):
         channel, variable = attr.get_name().split(".")
         cmd = self._channel_attrs[variable]["cmd"].lower()
         dtype = self._channel_attrs[variable]["dtype"]
         ans = self.query(f"{channel}.{cmd}?")
-        self.debug_stream(f"generic_read({channel}, {variable}) -> {ans}")
         
-        cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
+        cmd_ret, ans = [s.strip() for s in ans.split("=")]
         if cmd != cmd_ret:
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
@@ -145,10 +147,9 @@ class CryovacTIC500(Device):
         dtype = self._channel_attrs[variable]["dtype"]
         if issubclass(dtype, IntEnum):
             value = dtype(value).name
-        self.debug_stream(f"generic_write({channel}, {variable}, {value})")
         ans = self.query(f"{channel}.{variable}={value}")
-        cmd_ret, ans = [s.strip().lower() for s in ans.split("=")]
-        if cmd != cmd_ret:
+        cmd_ret, ans = [s.strip() for s in ans.split("=")]
+        if cmd != cmd_ret.lower():
             raise RuntimeError(
                 f"Received reply does not match command: {cmd} -> {cmd_ret}"
             )
