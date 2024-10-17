@@ -29,10 +29,11 @@ class PIDMode(IntEnum):
     # Follow = 2
 
 PIDInputs = IntEnum("PIDInputs", [
-    ("In 1", 0),
-    ("In 2", 1),
-    ("In 3", 2),
-    ("In 4", 3),
+    ("unselected", 0)
+    ("In 1", 1),
+    ("In 2", 2),
+    ("In 3", 3),
+    ("In 4", 4),
 ])
 
 
